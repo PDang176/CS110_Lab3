@@ -12,10 +12,20 @@ var searchString;
 
 // Fetch 10 new tweets removing all duplicates then call refreshTweets
 function fetchTweets(){
-    fetch(url).then(res => res.json()).then(data =>{
-        // Remove Duplicates
-        
-        refreshTweets();
+    // Checking if fetch tweets is paused
+    let paused = document.getElementById('pausebox').checked;
+    if(paused){
+        return;
+    }
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data =>{
+            // Remove Duplicates
+            console.log(data);
+
+            // // Refresh Page
+            // refreshTweets();
     })
 }
 
@@ -41,7 +51,7 @@ function refreshTweets(){
     const filteredResult = tweets.filter(tweet => tweet.text.toLowerCase().indexOf(searchString) !== -1);
     // sort by date
     // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}
-    const sortedResult = filteredResult.sort((a, b) => a.date - b.date);
+    const sortedResult = filteredResult.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
     // execute the arrow function for each tweet
     // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
@@ -69,4 +79,9 @@ function refreshTweets(){
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch new tweets and display them every 10 seconds
     var timer = setInterval(fetchTweets, 10000);
+
+    // Add Event Listener to Search Bar
+    document.getElementById('searchBar').addEventListener("input", event => {
+        searchString = event.target.value.trim().toLowerCase();
+    });
 });

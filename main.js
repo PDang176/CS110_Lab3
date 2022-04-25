@@ -27,7 +27,7 @@ function fetchTweets(tweetContainer){
                     tweetsIDs.add(newTweets[i].id);
                 }
             }
-            
+
             // Refresh Page
             refreshTweets(tweetContainer);
     }).catch(err => {
@@ -67,11 +67,42 @@ function refreshTweets(tweetContainer){
 
         // e.g. create a div holding tweet content
         const tweetContent = document.createElement("div");
+        tweetContent.classList.add('tweet-content');
+
+        // Create image for profile picture
+        const pfp = new Image();
+        pfp.src = tweetObject.user.profile_image_url_https;
+        pfp.alt = "N/A"
+        tweetContent.appendChild(pfp);
+
+        // Create container for text
+        const tweetInfo = document.createElement('div');
+        tweetInfo.classList.add('tweet-content-info');
+        tweetContent.appendChild(tweetInfo);
+
         // create a text node "safely" with HTML characters escaped
         // {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/createTextNode}
+
+        // Create paragraph for user name
+        const tweetAuthor = document.createElement('p');
+        tweetInfo.appendChild(tweetAuthor);
+
+        // Create span for user name
+        const userNameSpan = document.createElement('span');
+        const userName = document.createTextNode(tweetObject.user.name);
+        userNameSpan.appendChild(userName);
+        tweetAuthor.appendChild(userNameSpan);
+
+        // Create text for handle and date
+        const tweetDate = new Date(tweetObject.created_at);
+        const tweetAuthorText = document.createTextNode(' @' + tweetObject.user.screen_name + ' ' + tweetDate.toDateString());
+        tweetAuthor.appendChild(tweetAuthorText);
+
+        // Create paragraph for tweet text
+        const tweetTextp = document.createElement('p');
         const tweetText = document.createTextNode(tweetObject.text);
-        // append the text node to the div
-        tweetContent.appendChild(tweetText);
+        tweetTextp.append(tweetText);
+        tweetInfo.appendChild(tweetTextp);
 
         // you may want to put more stuff here like time, username...
         tweet.appendChild(tweetContent);

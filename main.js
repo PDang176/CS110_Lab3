@@ -1,36 +1,42 @@
 // URL for the Twitterfeed server
 const url = "http://ec2-18-209-247-77.compute-1.amazonaws.com:3000/feed/random?q=weather";
 
+// Timer variable for refreshing tweets
+var timer;
+
 // List of all tweets
 const tweets = [];
 
 // Set of all tweet ids seen
-const tweetIDs = new Set();
+const tweetsIDs = new Set();
 
 // String in the search bar
-var searchString;
+var searchString = "";
 
 // Fetch 10 new tweets removing all duplicates then call refreshTweets
-function fetchTweets(){
-    // Checking if fetch tweets is paused
-    let paused = document.getElementById('pausebox').checked;
-    if(paused){
-        return;
-    }
-
+function fetchTweets(tweetContainer){
     fetch(url)
         .then(res => res.json())
         .then(data =>{
+            let newTweets = data.statuses;
             // Remove Duplicates
-            console.log(data);
-
-            // // Refresh Page
-            // refreshTweets();
-    })
+            for(let i = 0; i < newTweets.length; i++){
+                // If the new tweet hasn't been seen before then add it
+                if(!tweetsIDs.has(newTweets[i].id)){
+                    tweets.push(newTweets[i]);
+                    tweetsIDs.add(newTweets[i].id);
+                }
+            }
+            
+            // Refresh Page
+            refreshTweets(tweetContainer);
+    }).catch(err => {
+        console.log(err);
+    });
 }
 
 // Refresh the page to display new tweets
-function refreshTweets(){
+function refreshTweets(tweetContainer){
     // feel free to use a more complicated heuristics like in-place-patch, for simplicity, we will clear all tweets and append all tweets back
     // {@link https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript}
     while (tweetContainer.firstChild) {
@@ -77,11 +83,25 @@ function refreshTweets(){
 
 // Run code only after document has been loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Reference to the div with the tag tweet-container
+    const tweetContainer = document.getElementById('tweet-container');
+
     // Fetch new tweets and display them every 10 seconds
-    var timer = setInterval(fetchTweets, 10000);
+    timer = setInterval(fetchTweets, 10000, tweetContainer);
 
     // Add Event Listener to Search Bar
-    document.getElementById('searchBar').addEventListener("input", event => {
+    document.getElementById('searchBar').addEventListener('input', event => {
         searchString = event.target.value.trim().toLowerCase();
+        refreshTweets(tweetContainer);
+    });
+
+    // Add Event Listener to Pause Box
+    document.getElementById('pausebox').addEventListener('change', event => {
+        if(event.target.checked){
+            clearInterval(timer);
+        }
+        else{
+            timer = setInterval(fetchTweets, 10000, tweetContainer);
+        }
     });
 });

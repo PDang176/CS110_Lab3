@@ -57,7 +57,7 @@ function refreshTweets(tweetContainer){
     const filteredResult = tweets.filter(tweet => tweet.text.toLowerCase().indexOf(searchString) !== -1);
     // sort by date
     // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}
-    const sortedResult = filteredResult.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const sortedResult = filteredResult.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     // execute the arrow function for each tweet
     // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
@@ -95,7 +95,7 @@ function refreshTweets(tweetContainer){
 
         // Create text for handle and date
         const tweetDate = new Date(tweetObject.created_at);
-        const tweetAuthorText = document.createTextNode(' @' + tweetObject.user.screen_name + ' ' + tweetDate.toDateString());
+        const tweetAuthorText = document.createTextNode(' @' + tweetObject.user.screen_name + ' ' + tweetDate.toDateString() + ' ' + tweetDate.toTimeString());
         tweetAuthor.appendChild(tweetAuthorText);
 
         // Create paragraph for tweet text
